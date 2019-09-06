@@ -3,6 +3,19 @@
            https://api.github.com/users/<your name>
 */
 
+
+// axios.get('https://api.github.com/users/frescocodes')
+//   .then(response => {
+//     console.log('done');
+//     response.data.message.forEach(item => {
+//       const newCard = createComponent(item);
+//       entryPoint.appendChild(newCard);
+//     });
+//   })
+//   .catch(reject => {
+//     console.log('data not returned', reject);
+//   });
+
 /* Step 2: Inspect and study the data coming back, this is YOUR 
    github info! You will need to understand the structure of this 
    data in order to use it to build your component function 
@@ -25,6 +38,27 @@
 */
 
 const followersArray = [];
+axios.get('https://api.github.com/users/frescocodes/followers')
+  .then(response => {
+    console.log(response);
+    response.data.forEach(e => {
+      followersArray.push(e.login);
+      
+    })
+    })
+  .catch(reject => {
+    console.log('broken', reject);
+  });
+  console.log(followersArray);
+
+followersArray.forEach(username => {
+  axios.get(`https://api.github.com/users/${username}/`)
+    .then(response => {
+      const newCard = createComponent(response.data);
+      entryPoint.appendChild(newCard);
+    });
+
+});
 
 /* Step 3: Create a function that accepts a single object as its only argument,
           Using DOM methods and properties, create a component that will return the following DOM element:
@@ -53,3 +87,56 @@ const followersArray = [];
   luishrd
   bigknell
 */
+entryPoint = document.querySelector('.cards');
+
+function createComponent(data) {
+  // create elements
+  const 
+  card = document.createElement('div'),
+  userImg = document.createElement('img'),
+  cardInfo = document.createElement('div'),
+  name = document.createElement('h3'),
+  username = document.createElement('p'),
+  location = document.createElement('p'),
+  profile = document.createElement('p'),
+  followers = document.createElement('p'),
+  following = document.createElement('p'),
+  bio = document.createElement('p');
+  // assign classes
+  card.classList.add('card');
+  cardInfo.classList.add('card-info');
+  name.classList.add('name');
+  username.classList.add('username');
+  // structure 
+  card.appendChild(userImg);
+  card.appendChild(cardInfo);
+  cardInfo.appendChild(name);
+  cardInfo.appendChild(username);
+  cardInfo.appendChild(location);
+  cardInfo.appendChild(profile);
+  cardInfo.appendChild(followers);
+  cardInfo.appendChild(following);
+  cardInfo.appendChild(bio);
+  // content 
+  userImg.src = data.avatar_url;
+  name.textContent = data.name;
+  username.textContent = data.login;
+  location.textContent = `Location: ${data.location}`;
+  profile.textContent = `Profile: ${data.html_url}`;
+  followers.textContent = `Followers: ${data.followers}`;
+  following.textContent = `Following: ${data.following}`;
+  bio.textContent = `Bio: ${data.bio}`;
+
+  return card;
+}
+
+
+axios.get('https://api.github.com/users/frescocodes')
+  .then(response => {
+    console.log(response);
+    const newCard = createComponent(response.data);
+    entryPoint.appendChild(newCard);
+    })
+  .catch(reject => {
+    console.log('data not returned', reject);
+  });
